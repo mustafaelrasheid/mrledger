@@ -1,4 +1,3 @@
-use aes_gcm::{Aes256Gcm, Key};
 use serde::{Serialize, Deserialize};
 use rsa::RsaPublicKey;
 use rand::rngs::OsRng;
@@ -11,9 +10,7 @@ pub struct Secret {
     pub title: String,
     pub content: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    pub description: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub hint: Option<String>,
+    pub tag: Option<String>,
     pub encryption: String,
     pub encoding: String,
 }
@@ -33,9 +30,13 @@ impl Secret {
     ) -> Self {
         return Self {
             title: title.to_string(),
-            content: encode64(&encrypt(content.as_bytes(), public_key)),
-            description: None,
-            hint: None,
+            content: encode64(
+                &encrypt(
+                    content.as_bytes(),
+                    public_key
+                )
+            ),
+            tag: None,
             encryption: "RSA-2048".to_string(),
             encoding: "base64".to_string(),
         };

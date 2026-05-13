@@ -21,5 +21,12 @@ pub enum Commands {
     Remind {
         title: String,
     },
-    Setup
+    Forget {
+        title: String,
+    },
+    Tag {
+        title: String,
+        tag: String
+    },
+    Setup,
 }
