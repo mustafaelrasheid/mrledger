@@ -1,0 +1,15 @@
+[package]
+name = "mrledger"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+aes-gcm = "0.10.3"
+argon2 = "0.5.3"
+base64 = "0.22.1"
+clap = { version = "4.6.1", features = ["derive"] }
+dialoguer = "0.12.0"
+rand = "0.8.0"
+rsa = "0.9.10"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
