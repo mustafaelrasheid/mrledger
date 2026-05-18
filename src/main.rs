@@ -2,6 +2,7 @@ mod args;
 mod utils;
 mod secret;
 mod config;
+mod error;
 
 use std::process::exit;
 use std::fs::{read_to_string, remove_file, write};
