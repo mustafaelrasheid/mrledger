@@ -1,9 +1,5 @@
 use serde::{Serialize, Deserialize};
-use rsa::RsaPublicKey;
-use rand::rngs::OsRng;
-use rsa::Pkcs1v15Encrypt;
-use rsa::pkcs8::DecodePublicKey;
-use crate::utils::encode64;
+use crate::utils::{encode64, encrypt_rsa};
 
 #[derive(Serialize, Deserialize)]
 pub struct Secret {
@@ -15,13 +11,6 @@ pub struct Secret {
     pub encoding: String,
 }
 
-fn encrypt(input: &[u8], public_key_str: &str) -> Vec<u8> {
-    return RsaPublicKey::from_public_key_pem(public_key_str)
-        .expect("Failed to parse public key")
-        .encrypt(&mut OsRng, Pkcs1v15Encrypt, input)
-        .expect("Failed to encrypt");
-}
-
 impl Secret {
     pub fn new(
         title: &str,
@@ -31,7 +20,7 @@ impl Secret {
         return Self {
             title: title.to_string(),
             content: encode64(
-                &encrypt(
+                &encrypt_rsa(
                     content.as_bytes(),
                     public_key
                 )
