@@ -9,6 +9,7 @@ argon2 = "0.5.3"
 base64 = "0.22.1"
 clap = { version = "4.6.1", features = ["derive"] }
 dialoguer = "0.12.0"
+inquire = "0.9.4"
 rand = "0.8.0"
 rsa = "0.9.10"
 serde = { version = "1.0.228", features = ["derive"] }

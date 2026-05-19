@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use argon2::password_hash::SaltString;
+use argon2::password_hash::{SaltString, Error as Argon2Error};
 use crate::utils::{
     encode64,
     generate_key_pair,
@@ -34,5 +34,9 @@ impl Config {
             salt: salt.to_string(),
             private_key_encryption: "Argon+AES".to_string()
         };
+    }
+
+    pub fn get_salt(&self) -> Result<SaltString, Argon2Error> {
+        return SaltString::from_b64(&self.salt);
     }
 }
