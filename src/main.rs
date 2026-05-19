@@ -9,7 +9,8 @@ use std::fs::{read_to_string, remove_file, write, create_dir_all};
 use std::env::var;
 use clap::Parser;
 use rsa::pkcs8::DecodePrivateKey;
-use rsa::{RsaPrivateKey, Pkcs1v15Encrypt};
+use rsa::{RsaPrivateKey, Oaep};
+use sha2::Sha256;
 use inquire::Text;
 use inquire::validator::Validation;
 use crate::args::{Cli, Commands};
@@ -138,6 +139,11 @@ fn main() {
                             &password,
                             &config.get_salt().expect_or_exit("Invalid salt")
                         ),
+                        decode64(&config.nonce)
+                            .expect_or_exit("Invalid nonce")
+                            .as_slice()
+                            .try_into()
+                            .expect_or_exit("Invalid nonce"),
                         &*decode64(&config.private_key)
                             .expect_or_exit("Invalid base64 encoding")
                     ).expect_or_exit("Failed to decrypt private key")
@@ -145,7 +151,7 @@ fn main() {
             ).expect_or_exit("Failed to parse private key");
             let plaintext = String::from_utf8(
                 key.decrypt(
-                    Pkcs1v15Encrypt,
+                    Oaep::new::<Sha256>(),
                     &decode64(&secret.content)
                         .expect_or_exit("Invalid base64 encoding")
                 ).expect_or_exit("Failed to decrypt content")

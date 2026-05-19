@@ -1,4 +1,4 @@
-use aes_gcm::{Aes256Gcm, Key, KeyInit, Nonce, Error as AesError};
+use aes_gcm::{Aes256Gcm, Key, KeyInit, Nonce, Error as AesError, AeadCore};
 use aes_gcm::aead::Aead;
 use rand::rngs::OsRng;
 use rand::thread_rng;
@@ -6,13 +6,15 @@ use rsa::{
     RsaPrivateKey,
     RsaPublicKey,
     pkcs8,
-    Pkcs1v15Encrypt
+    Oaep,
 };
+use sha2::Sha256;
 use rsa::pkcs8::{EncodePrivateKey, EncodePublicKey, DecodePublicKey};
 use base64::engine::general_purpose;
 use base64::{Engine, DecodeError};
 use argon2::{Argon2, PasswordHasher};
 use argon2::password_hash::{SaltString};
+use typenum::U12;
 use crate::error::InvalidInput;
 
 pub fn encode64(input: &[u8]) -> String {
@@ -60,13 +62,16 @@ pub fn hash_password(password: &str, salt: &SaltString)
     return key;
 }
 
-pub fn encrypt_key_aes(input: &[u8], key: &Key<Aes256Gcm>) -> Vec<u8> {
-    let nonce_bytes = [0u8; 12];
+pub fn encrypt_key_aes(input: &[u8], key: &Key<Aes256Gcm>) -> (Vec<u8>, Nonce<U12>) {
+    let nonce_bytes = Aes256Gcm::generate_nonce(&mut OsRng);
     let nonce = Nonce::from_slice(&nonce_bytes);
 
-    return Aes256Gcm::new(key)
-        .encrypt(nonce, input)
-        .unwrap();
+    return (
+        Aes256Gcm::new(key)
+            .encrypt(nonce, input)
+            .unwrap(),
+        *nonce
+    );
 }
 
 pub fn encrypt_rsa(input: &[u8], public_key_str: &str)
@@ -77,16 +82,17 @@ pub fn encrypt_rsa(input: &[u8], public_key_str: &str)
                 format!("unable to parse public key: {}", e)
             )
         )?
-        .encrypt(&mut OsRng, Pkcs1v15Encrypt, input)
+        .encrypt(&mut OsRng, Oaep::new::<Sha256>(), input)
         .expect("Failed to encrypt");
 
     return Ok(val);
 }
 
-pub fn decrypt_aes(password_hash: &Key<Aes256Gcm>, input: &[u8])
--> Result<Vec<u8>, AesError> {
-    let nonce_bytes = [0u8; 12];
-
+pub fn decrypt_aes(
+    password_hash: &Key<Aes256Gcm>,
+    nonce_bytes: [u8; 12],
+    input: &[u8]
+) -> Result<Vec<u8>, AesError> {
     return Aes256Gcm::new(password_hash)
         .decrypt(
             Nonce::from_slice(&nonce_bytes),

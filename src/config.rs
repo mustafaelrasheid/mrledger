@@ -12,6 +12,7 @@ pub struct Config {
     pub public_key: String,
     pub private_key: String,
     pub salt: String,
+    pub nonce: String,
     pub private_key_encryption: String,
 }
 
@@ -22,15 +23,17 @@ impl Config {
         let salt = SaltString::generate(rand::thread_rng());
         let (public_key, private_key) = generate_key_pair();
         let hashed_password = hash_password(&password, &salt);
+        let (encrypted_key, nonce) = encrypt_key_aes(
+            private_key.as_bytes(),
+            &hashed_password
+        );
 
         return Self {
             public_key: public_key,
             private_key: encode64(
-                &encrypt_key_aes(
-                    private_key.as_bytes(),
-                    &hashed_password
-                )
+                &encrypted_key
             ),
+            nonce: encode64(&nonce),
             salt: salt.to_string(),
             private_key_encryption: "Argon+AES".to_string()
         };
