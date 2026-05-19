@@ -1,10 +1,10 @@
 # MrLedger
-If you keep a secret to yourself for too long, you migh forget it!
+If you keep a secret to yourself for too long, you might forget it!
 MrLedger is somewhere you can keep your all those secrets in.
 
 ## Setup
 to setup, Run `mrledger setup` and type your password twice.
-NOTE: If you reconfigure, you can permenantly lose all your data.
+NOTE: If you reconfigure, you can permanently lose all your data.
 
 ## Usage
  - `mrledger tell`: To tell mrledger a secret.

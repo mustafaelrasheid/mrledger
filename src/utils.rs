@@ -1,4 +1,4 @@
-use aes_gcm::{Aes256Gcm, Key, KeyInit, Nonce};
+use aes_gcm::{Aes256Gcm, Key, KeyInit, Nonce, Error as AesError};
 use aes_gcm::aead::Aead;
 use rand::rngs::OsRng;
 use rand::thread_rng;
@@ -13,7 +13,7 @@ use base64::engine::general_purpose;
 use base64::{Engine, DecodeError};
 use argon2::{Argon2, PasswordHasher};
 use argon2::password_hash::{SaltString};
-
+use crate::error::InvalidInput;
 
 pub fn encode64(input: &[u8]) -> String {
     return general_purpose::STANDARD
@@ -29,7 +29,7 @@ pub fn generate_key_pair() -> (String, String) {
     const BITS: usize = 2048;
     let mut rng = thread_rng();
     let private_key = RsaPrivateKey::new(&mut rng, BITS)
-        .unwrap();
+        .expect("Failed to generate private key");
     let public_key = RsaPublicKey::from(&private_key);
     let private_pem = private_key
         .to_pkcs8_pem(pkcs8::LineEnding::LF)
@@ -69,9 +69,27 @@ pub fn encrypt_key_aes(input: &[u8], key: &Key<Aes256Gcm>) -> Vec<u8> {
         .unwrap();
 }
 
-pub fn encrypt_rsa(input: &[u8], public_key_str: &str) -> Vec<u8> {
-    return RsaPublicKey::from_public_key_pem(public_key_str)
-        .expect("Failed to parse public key")
+pub fn encrypt_rsa(input: &[u8], public_key_str: &str)
+-> Result<Vec<u8>, InvalidInput> {
+    let val = RsaPublicKey::from_public_key_pem(public_key_str)
+        .map_err(|e| 
+            InvalidInput::MissingData(
+                format!("unable to parse public key: {}", e)
+            )
+        )?
         .encrypt(&mut OsRng, Pkcs1v15Encrypt, input)
         .expect("Failed to encrypt");
+
+    return Ok(val);
+}
+
+pub fn decrypt_aes(password_hash: &Key<Aes256Gcm>, input: &[u8])
+-> Result<Vec<u8>, AesError> {
+    let nonce_bytes = [0u8; 12];
+
+    return Aes256Gcm::new(password_hash)
+        .decrypt(
+            Nonce::from_slice(&nonce_bytes),
+            input
+        );
 }
