@@ -100,9 +100,9 @@ fn main() {
         Commands::Tell { title } => {
             let config = get_config(&secrets_dir);
             let content: String = Text::new("What's on your mind?")
-                .with_formatter(&|s| format!("{} ({}/240)", s, s.len()))
+                .with_formatter(&|s| format!("{} ({}/180)", s, s.len()))
                 .with_validator(|s: &str|{
-                    if s.len() <= 240 {
+                    if s.len() <= 185 {
                         return Ok(Validation::Valid);
                     } else {
                         return Ok(
