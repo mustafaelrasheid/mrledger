@@ -3,7 +3,7 @@ If you keep a secret to yourself for too long, you might forget it!
 MrLedger is somewhere you can keep your all those secrets in.
 
 ## Setup
-to setup, Run `mrledger setup` and type your password twice.
+To setup, Run `mrledger setup` and type your password twice.
 NOTE: If you reconfigure, you can permanently lose all your data.
 
 ## Usage

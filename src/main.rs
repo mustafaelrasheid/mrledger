@@ -131,13 +131,14 @@ fn main() {
                 .with_prompt("Password, please?")
                 .interact()
                 .expect_or_exit("Failed to get key");
-            
             let key = RsaPrivateKey::from_pkcs8_pem(
                 &String::from_utf8(
                     decrypt_aes(
                         &hash_password(
                             &password,
-                            &config.get_salt().expect_or_exit("Invalid salt")
+                            &config
+                                .get_salt()
+                                .expect_or_exit("Invalid salt")
                         ),
                         decode64(&config.nonce)
                             .expect_or_exit("Invalid nonce")
