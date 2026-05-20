@@ -62,7 +62,8 @@ pub fn hash_password(password: &str, salt: &SaltString)
     return key;
 }
 
-pub fn encrypt_key_aes(input: &[u8], key: &Key<Aes256Gcm>) -> (Vec<u8>, Nonce<U12>) {
+pub fn encrypt_key_aes(input: &[u8], key: &Key<Aes256Gcm>)
+-> (Vec<u8>, Nonce<U12>) {
     let nonce_bytes = Aes256Gcm::generate_nonce(&mut OsRng);
     let nonce = Nonce::from_slice(&nonce_bytes);
 
