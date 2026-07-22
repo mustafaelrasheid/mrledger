@@ -5,28 +5,28 @@ use clap::{Parser, Subcommand};
 #[command(version = "1.0.1")]
 #[command(author = "mustafaelrasheid")]
 #[command(
-    about = "somewhere for secrets",
-    long_about = None
+	about = "somewhere for secrets",
+	long_about = None
 )]
 pub struct Cli {
-    #[command(subcommand)]
-    pub command: Commands,
+	#[command(subcommand)]
+	pub command: Commands,
 }
 
 #[derive(Subcommand)]
 pub enum Commands {
-    Tell {
-        title: String,
-    },
-    Remind {
-        title: String,
-    },
-    Forget {
-        title: String,
-    },
-    Tag {
-        title: String,
-        tag: String
-    },
-    Setup,
+	Tell {
+		title: String,
+	},
+	Remind {
+		title: String,
+	},
+	Forget {
+		title: String,
+	},
+	Tag {
+		title: String,
+		tag: String
+	},
+	Setup,
 }
