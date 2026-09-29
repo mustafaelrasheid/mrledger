@@ -1,7 +1,13 @@
 [package]
 name = "mrledger"
+description = "Somewhere to keep your secrets!"
 version = "1.0.1"
 edition = "2024"
+homepage = "https://github.com/mustafaelrasheid/mrledger"
+repository = "https://github.com/mustafaelrasheid/mrledger"
+license = "MIT"
+keywords = ["cli", "secrets", "vault", "encryption"]
+categories = ["command-line-utilities", "cryptography"]
 
 [dependencies]
 aes-gcm = "0.10.3"
